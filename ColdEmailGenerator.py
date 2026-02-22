@@ -1,13 +1,6 @@
 import streamlit as st
 import os
 
-# Set API key from Streamlit secrets BEFORE importing CrewAI
-try:
-    if "GROQ_API_KEY" in st.secrets:
-        os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
-except Exception:
-    pass
-
 # Now import CrewAI and other dependencies
 from crewai import Agent, Task, Crew, LLM
 from crewai_tools import ScrapeWebsiteTool
@@ -24,6 +17,21 @@ st.markdown("Generate personalized cold emails by analyzing target company websi
 
 # Sidebar for inputs
 with st.sidebar:
+    st.header("🔑 API Configuration")
+    
+    groq_api_key_input = st.text_input(
+        "Groq API Key",
+        type="password",
+        placeholder="gsk_...",
+        help="Enter your Groq API key (or set in Streamlit secrets)",
+        value=os.getenv("GROQ_API_KEY", "")
+    )
+    
+    # Set API key from input if provided
+    if groq_api_key_input:
+        os.environ["GROQ_API_KEY"] = groq_api_key_input
+    
+    st.markdown("---")
     st.header("🎯 Target Information")
     
     target_website = st.text_input(
