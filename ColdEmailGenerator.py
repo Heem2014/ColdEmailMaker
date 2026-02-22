@@ -1,21 +1,17 @@
 import streamlit as st
 import os
 
-# Now import CrewAI and other dependencies
 from crewai import Agent, Task, Crew, LLM
 from crewai_tools import ScrapeWebsiteTool
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Page config
 st.set_page_config(page_title="Cold Email Generator", page_icon="📧", layout="wide")
 
-# Title and description
 st.title("📧 Cold Email Generator")
 st.markdown("Generate personalized cold emails by analyzing target company websites")
 
-# Sidebar for inputs
 with st.sidebar:
     st.header("🔑 API Configuration")
     
@@ -27,7 +23,6 @@ with st.sidebar:
         value=os.getenv("GROQ_API_KEY", "")
     )
     
-    # Set API key from input if provided
     if groq_api_key_input:
         os.environ["GROQ_API_KEY"] = groq_api_key_input
     
@@ -66,20 +61,17 @@ with st.sidebar:
     
     generate_button = st.button("🚀 Generate Cold Email", type="primary", use_container_width=True)
 
-# Main content area
 if generate_button:
     if not all([target_website, agency_services, ceo_name, your_name, your_company]):
         st.error("⚠️ Please fill in all fields in the sidebar")
     else:
         with st.spinner("🔍 Analyzing website and generating personalized email..."):
             try:
-                # Check for API key
                 groq_api_key = os.getenv("GROQ_API_KEY")
                 if not groq_api_key:
                     st.error("❌ GROQ_API_KEY not found. Please set it in your Streamlit secrets or .env file")
                     st.stop()
                 
-                # Initialize tools and LLM
                 scraper = ScrapeWebsiteTool()
                 
                 llm = LLM(
@@ -87,7 +79,6 @@ if generate_button:
                     api_key=groq_api_key
                 )
                 
-                # Create agents
                 research_agent = Agent(
                     role="Website Research Specialist",
                     goal=f"Analyze {target_website} and extract key business information, pain points, and opportunities",
@@ -105,7 +96,6 @@ if generate_button:
                     verbose=True
                 )
                 
-                # Create tasks
                 research_task = Task(
                     description=f"""
                     Analyze the website {target_website} and extract:
@@ -146,7 +136,6 @@ if generate_button:
                     context=[research_task]
                 )
                 
-                # Create and run crew
                 crew = Crew(
                     agents=[research_agent, email_writer_agent],
                     tasks=[research_task, email_writing_task],
@@ -155,14 +144,11 @@ if generate_button:
                 
                 result = crew.kickoff()
                 
-                # Display results
                 st.success("✅ Email generated successfully!")
                 
-                # Display the generated email
                 st.markdown("---")
                 st.markdown("### 📬 Generated Cold Email")
                 
-                # Create a nice card for the email
                 with st.container():
                     st.markdown(f"""
                     <div style="background-color: #1e1e1e; padding: 20px; border-radius: 10px; border-left: 5px solid #1f77b4; color: #ffffff;">
@@ -170,7 +156,6 @@ if generate_button:
                     </div>
                     """, unsafe_allow_html=True)
                 
-                # Copy to clipboard button
                 st.markdown("---")
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col2:
@@ -187,7 +172,6 @@ if generate_button:
                 st.info("💡 Tip: Make sure all API keys are set in your .env file")
 
 else:
-    # Welcome message when no email is generated
     st.info("👈 Fill in the target information in the sidebar and click 'Generate Cold Email' to get started")
     
     st.markdown("---")
