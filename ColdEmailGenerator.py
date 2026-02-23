@@ -1,12 +1,6 @@
 import streamlit as st
 import os
 
-from crewai import Agent, Task, Crew, LLM
-from crewai_tools import ScrapeWebsiteTool
-from dotenv import load_dotenv
-
-load_dotenv()
-
 st.set_page_config(page_title="Cold Email Generator", page_icon="📧", layout="wide")
 
 st.title("📧 Cold Email Generator")
@@ -19,12 +13,9 @@ with st.sidebar:
         "Groq API Key",
         type="password",
         placeholder="gsk_...",
-        help="Enter your Groq API key (or set in Streamlit secrets)",
-        value=os.getenv("GROQ_API_KEY", "")
+        help="Enter your Groq API key",
+        value=""
     )
-    
-    if groq_api_key_input:
-        os.environ["GROQ_API_KEY"] = groq_api_key_input
     
     st.markdown("---")
     st.header("🎯 Target Information")
@@ -64,19 +55,21 @@ with st.sidebar:
 if generate_button:
     if not all([target_website, agency_services, ceo_name, your_name, your_company]):
         st.error("⚠️ Please fill in all fields in the sidebar")
+    elif not groq_api_key_input:
+        st.error("❌ Please enter your Groq API key in the sidebar")
     else:
         with st.spinner("🔍 Analyzing website and generating personalized email..."):
             try:
-                groq_api_key = os.getenv("GROQ_API_KEY")
-                if not groq_api_key:
-                    st.error("❌ GROQ_API_KEY not found. Please set it in your Streamlit secrets or .env file")
-                    st.stop()
+                os.environ["GROQ_API_KEY"] = groq_api_key_input
+                
+                from crewai import Agent, Task, Crew, LLM
+                from crewai_tools import ScrapeWebsiteTool
                 
                 scraper = ScrapeWebsiteTool()
                 
                 llm = LLM(
                     model="groq/llama-3.3-70b-versatile",
-                    api_key=groq_api_key
+                    api_key=groq_api_key_input
                 )
                 
                 research_agent = Agent(
@@ -169,7 +162,6 @@ if generate_button:
                 
             except Exception as e:
                 st.error(f"❌ An error occurred: {str(e)}")
-                st.info("💡 Tip: Make sure all API keys are set in your .env file")
 
 else:
     st.info("👈 Fill in the target information in the sidebar and click 'Generate Cold Email' to get started")
