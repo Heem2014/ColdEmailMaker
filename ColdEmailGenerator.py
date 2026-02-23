@@ -62,14 +62,16 @@ if generate_button:
             try:
                 os.environ["GROQ_API_KEY"] = groq_api_key_input
                 
-                from crewai import Agent, Task, Crew, LLM
+                from crewai import Agent, Task, Crew
                 from crewai_tools import ScrapeWebsiteTool
+                from langchain_groq import ChatGroq
                 
                 scraper = ScrapeWebsiteTool()
                 
-                llm = LLM(
-                    model="groq/llama-3.3-70b-versatile",
-                    api_key=groq_api_key_input
+                llm = ChatGroq(
+                    model="llama-3.3-70b-versatile",
+                    api_key=groq_api_key_input,
+                    temperature=0.7
                 )
                 
                 research_agent = Agent(

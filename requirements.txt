@@ -1,5 +1,5 @@
 crewai>=0.100.0
 crewai-tools>=0.33.0
-google-genai
+langchain-groq
 python-dotenv
 streamlit
