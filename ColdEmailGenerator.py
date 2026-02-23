@@ -68,7 +68,7 @@ if generate_button:
                 scraper = ScrapeWebsiteTool()
                 
                 llm = LLM(
-                    model="gemini/gemini-1.5-flash",
+                    model="gemini/gemini-2.5-flash",
                     api_key=gemini_api_key_input
                 )
                 
