@@ -9,11 +9,11 @@ st.markdown("Generate personalized cold emails by analyzing target company websi
 with st.sidebar:
     st.header("🔑 API Configuration")
     
-    groq_api_key_input = st.text_input(
-        "Groq API Key",
+    gemini_api_key_input = st.text_input(
+        "Gemini API Key",
         type="password",
-        placeholder="gsk_...",
-        help="Enter your Groq API key",
+        placeholder="AIza...",
+        help="Enter your Gemini API key",
         value=""
     )
     
@@ -55,12 +55,12 @@ with st.sidebar:
 if generate_button:
     if not all([target_website, agency_services, ceo_name, your_name, your_company]):
         st.error("⚠️ Please fill in all fields in the sidebar")
-    elif not groq_api_key_input:
-        st.error("❌ Please enter your Groq API key in the sidebar")
+    elif not gemini_api_key_input:
+        st.error("❌ Please enter your Gemini API key in the sidebar")
     else:
         with st.spinner("🔍 Analyzing website and generating personalized email..."):
             try:
-                os.environ["GROQ_API_KEY"] = groq_api_key_input
+                os.environ["GEMINI_API_KEY"] = gemini_api_key_input
                 
                 from crewai import Agent, Task, Crew, LLM
                 from crewai_tools import ScrapeWebsiteTool
@@ -68,8 +68,8 @@ if generate_button:
                 scraper = ScrapeWebsiteTool()
                 
                 llm = LLM(
-                    model="groq/llama-3.3-70b-versatile",
-                    api_key=groq_api_key_input
+                    model="gemini/gemini-1.5-flash",
+                    api_key=gemini_api_key_input
                 )
                 
                 research_agent = Agent(
